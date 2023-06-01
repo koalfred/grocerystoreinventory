@@ -2,9 +2,9 @@
 
 from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 
-engine = create_engine('sqlite:///inventory.db', echo=True)
+engine = create_engine('sqlite:///inventory.db')
 Session = sessionmaker(bind=engine)
 session = Session()
 Base = declarative_base()
@@ -12,15 +12,17 @@ Base = declarative_base()
 class Brands(Base):
     __tablename__ = 'brands'
 
-    brand_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     brand_name = Column(String)
+    product = relationship("Product", back_populates="brand")
 
 class Product(Base):
     __tablename__ = 'products'
 
-    product_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     product_name = Column('Product Name', String)
     product_quantity = Column('Product Quantity', Integer)
     product_price = Column('Product Price', Integer)
     date_updated = Column('Date Updated', Date)
-    brand_id = Column(Integer, ForeignKey("brands.brand_id"))
+    brand_id = Column(Integer, ForeignKey("brands.id"))
+    brand = relationship("Brands", back_populates="product")

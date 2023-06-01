@@ -46,18 +46,26 @@ def clean_date(date_str):
                 \r Press enter to try again.
             ''')
         return
+    except IndexError:
+        input('''
+                \nThe date should be in the following format:
+                \rMonth-Day-Year
+                \rEx: 5/19/2023
+                \r Press enter to try again.
+            ''')
+        return
     else:
         return return_date
 
 def clean_id(id_str, id_options):
     try:
-        product_id = int(id_str) 
+        id = int(id_str) 
     except ValueError:
         input("The ID must be an integer. Press enter and try again.")
         return
     else:
-        if product_id in id_options:
-            return product_id
+        if id in id_options:
+            return id
         else:
             input("The integer that you typed in is out of the range. Press enter and try again.")
             return
@@ -85,8 +93,8 @@ def add_csv():
                 product_price = clean_price(inventory_row[1])
                 product_quantity = inventory_row[2]
                 date_updated = clean_date(inventory_row[3])
-                brand_name = inventory_row[4]
-                new_product = Product(product_name=product_name, product_price=product_price, product_quantity=product_quantity, date_updated=date_updated, brand_id=brand_name)
+                brand_id = inventory_row[4]
+                new_product = Product(product_name=product_name, product_price=product_price, product_quantity=product_quantity, date_updated=date_updated, brand_id=brand_id)
                 session.add(new_product)
         session.commit()
             
@@ -109,7 +117,7 @@ def app():
         id_options = []
 
         for product in session.query(Product):
-            id_options.append(product.product_id)
+            id_options.append(product.id)
         id_error = True
         while id_error:
             id_choice = input(f'''
@@ -118,7 +126,7 @@ def app():
             id_choice = clean_id(id_choice, id_options)
             if type(id_choice) == int:
                 id_error = False
-        the_product = session.query(Product).filter(Product.product_id==id_choice).first()
+        the_product = session.query(Product).filter(Product.id==id_choice).first()
         print(f'''
                 \nProduct Name: {the_product.product_name}
                 \rPrice: {the_product.product_price}
@@ -179,8 +187,8 @@ def app():
         def create_backup():
             header = ['Product ID', 'Product Name', 'Product Price', 'Product Quantity', 'Date Updated', 'Brand']
             header_2 = ['Brand ID', 'Brand Name']
-            info = session.query(Product.product_id, Product.product_name, Product.product_price, Product.product_quantity, Product.date_updated, Product.brand_id)
-            info_2 = session.query(Brands.brand_id, Brands.brand_name)
+            info = session.query(Product.id, Product.product_name, Product.product_price, Product.product_quantity, Product.date_updated, Product.brand_id)
+            info_2 = session.query(Brands.id, Brands.brand_name)
 
             with open('backup_inventory.csv', 'w') as f:
                 writer = csv.writer(f)
