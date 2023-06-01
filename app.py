@@ -93,7 +93,7 @@ def add_csv():
                 product_price = clean_price(inventory_row[1])
                 product_quantity = inventory_row[2]
                 date_updated = clean_date(inventory_row[3])
-                brand_id = inventory_row[4]
+                brand_id = session.query(Brands.id).filter(Brands.brand_name==inventory_row[4])
                 new_product = Product(product_name=product_name, product_price=product_price, product_quantity=product_quantity, date_updated=date_updated, brand_id=brand_id)
                 session.add(new_product)
         session.commit()
