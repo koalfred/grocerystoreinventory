@@ -1,6 +1,6 @@
 # This is where I learned to remove the dollar sign ($) from the prices when cleaning up the data: https://builtin.com/software-engineering-perspectives/python-remove-character-from-string
 
-from models import (Brands, session, Base, Product, engine)
+from models import (Brands, Brand, session, Base, Product, engine)
 import csv
 import datetime
 
@@ -94,7 +94,8 @@ def add_csv():
                 product_quantity = inventory_row[2]
                 date_updated = clean_date(inventory_row[3])
                 brand_id = session.query(Brands.id).filter(Brands.brand_name==inventory_row[4])
-                new_product = Product(product_name=product_name, product_price=product_price, product_quantity=product_quantity, date_updated=date_updated, brand_id=brand_id)
+                brand_name = session.query(Brand.brand_name)
+                new_product = Product(product_name=product_name, product_price=product_price, product_quantity=product_quantity, date_updated=date_updated, brand_id=brand_name)
                 session.add(new_product)
         session.commit()
             
@@ -158,7 +159,13 @@ def app():
             date_updated_cleaned = clean_date(date_updated)
             if type(date_updated_cleaned) == datetime.date:
                 date_error = False
-        brand_name = input('Brand: ')
+        brand_name_input = input('Brand: ')
+        brand_name_in_db = session.query(Brand.brand_name).one_or_none()
+        if brand_name_in_db == None:
+            brand_name_input = Brand(brand_name=brand_name)
+            session.add(brand_name_input)
+        else:    
+            brand_name = Brands.id
         new_product = Product(product_name=product_name, product_price=product_price_cleaned, product_quantity=product_quantity_cleaned, date_updated=date_updated_cleaned, brand_id=brand_name)
         new_brand = Brands(brand_name=brand_name)
         session.add(new_brand)

@@ -26,3 +26,9 @@ class Product(Base):
     date_updated = Column('Date Updated', Date)
     brand_id = Column(Integer, ForeignKey("brands.id"))
     brand = relationship("Brands", back_populates="product")
+
+class Brand(Base):
+    __tablename__ = 'brand'
+
+    id = Column(Integer, primary_key=True)
+    brand_name = Column(String)
