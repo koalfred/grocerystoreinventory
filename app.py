@@ -1,6 +1,6 @@
 # This is where I learned to remove the dollar sign ($) from the prices when cleaning up the data: https://builtin.com/software-engineering-perspectives/python-remove-character-from-string
 
-from models import (Brands, Brand, session, Base, Product, engine)
+from models import (Brands, session, Base, Product, engine)
 import csv
 import datetime
 
@@ -94,8 +94,8 @@ def add_csv():
                 product_quantity = inventory_row[2]
                 date_updated = clean_date(inventory_row[3])
                 brand_id = session.query(Brands.id).filter(Brands.brand_name==inventory_row[4])
-                brand_name = session.query(Brand.brand_name)
-                new_product = Product(product_name=product_name, product_price=product_price, product_quantity=product_quantity, date_updated=date_updated, brand_id=brand_name)
+                # brand_name = session.query(Brands.brand_name)
+                new_product = Product(product_name=product_name, product_price=product_price, product_quantity=product_quantity, date_updated=date_updated, brand_id=brand_id)
                 session.add(new_product)
         session.commit()
             
@@ -160,15 +160,15 @@ def app():
             if type(date_updated_cleaned) == datetime.date:
                 date_error = False
         brand_name_input = input('Brand: ')
-        brand_name_in_db = session.query(Brand.brand_name).one_or_none()
+        brand_name_in_db = session.query(Brands).filter(Brands.brand_name==brand_name_input).one_or_none()
         if brand_name_in_db == None:
-            brand_name_input = Brand(brand_name=brand_name)
-            session.add(brand_name_input)
+            new_brand = Brands(brand_name=brand_name_input)
+            session.add(new_brand)
+            session.commit()
+            brand_name = session.query(Brands).filter(Brands.brand_name==brand_name_input).first().id
         else:    
-            brand_name = Brands.id
+            brand_name = brand_name_in_db.id
         new_product = Product(product_name=product_name, product_price=product_price_cleaned, product_quantity=product_quantity_cleaned, date_updated=date_updated_cleaned, brand_id=brand_name)
-        new_brand = Brands(brand_name=brand_name)
-        session.add(new_brand)
         session.add(new_product)
         session.commit()
         input('Product added. Press enter to continue.')
@@ -178,7 +178,7 @@ def app():
         # Analyze the database
         most_expensive_item = session.query(Product.product_name).order_by(Product.product_price.desc()).first()
         least_expensive_item = session.query(Product.product_name).order_by(Product.product_price).first()
-        brand_most_products = session.query(Product.brand_id).order_by(Product.product_name).first()
+        brand_most_products = session.query(Brands.brand_name).order_by(Brands.id).first()
         product_with_highest_quantity = session.query(Product.product_name).order_by(Product.product_quantity.desc()).first()
         total_products = session.query(Product).count()
         print(f'''Most Expensive Item: {most_expensive_item}''')
