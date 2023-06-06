@@ -94,7 +94,6 @@ def add_csv():
                 product_quantity = inventory_row[2]
                 date_updated = clean_date(inventory_row[3])
                 brand_id = session.query(Brands.id).filter(Brands.brand_name==inventory_row[4])
-                # brand_name = session.query(Brands.brand_name)
                 new_product = Product(product_name=product_name, product_price=product_price, product_quantity=product_quantity, date_updated=date_updated, brand_id=brand_id)
                 session.add(new_product)
         session.commit()
@@ -175,18 +174,24 @@ def app():
         app()
 
     if menu_input.lower() == 'a':
+        with open('inventory.csv') as csvfile2:
+            data = csv.reader(csvfile2)
+            rows = list(data)
+            for inventory_row in rows[1:]:
+                brand_name = session.query(Brands.brand_name).filter(Brands.brand_name==inventory_row[4])
         # Analyze the database
-        most_expensive_item = session.query(Product.product_name).order_by(Product.product_price.desc()).first()
-        least_expensive_item = session.query(Product.product_name).order_by(Product.product_price).first()
-        brand_most_products = session.query(Brands.brand_name).order_by(Brands.id).first()
-        product_with_highest_quantity = session.query(Product.product_name).order_by(Product.product_quantity.desc()).first()
-        total_products = session.query(Product).count()
-        print(f'''Most Expensive Item: {most_expensive_item}''')
-        print(f'''Least Expensive Item: {least_expensive_item}''')
-        print(f'''Brand with most products: {brand_most_products}''')
-        print(f'''Product with highest quantity in stock: {product_with_highest_quantity}''')
-        print(f'''Total number of product types: {total_products}''')
-        input('Press enter to return to the main menu. ')
+            new_product = Product(brand_id=brand_name)
+            most_expensive_item = session.query(Product.product_name).order_by(Product.product_price.desc()).first()
+            least_expensive_item = session.query(Product.product_name).order_by(Product.product_price).first()
+            brand_most_products = session.query(Product.brand_id).order_by(Product.product_name).first()
+            product_with_highest_quantity = session.query(Product.product_name).order_by(Product.product_quantity.desc()).first()
+            total_products = session.query(Product).count()
+            print(f'''Most Expensive Item: {most_expensive_item}''')
+            print(f'''Least Expensive Item: {least_expensive_item}''')
+            print(f'''Brand with most products: {brand_most_products}''')
+            print(f'''Product with highest quantity in stock: {product_with_highest_quantity}''')
+            print(f'''Total number of product types: {total_products}''')
+            input('Press enter to return to the main menu. ')
         app()
 
     if menu_input.lower() == 'b':
