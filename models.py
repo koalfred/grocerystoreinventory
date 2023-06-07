@@ -1,6 +1,6 @@
 # This is where I learned to remove the dollar sign ($) from the prices when cleaning up the data: https://builtin.com/software-engineering-perspectives/python-remove-character-from-string
 
-from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 

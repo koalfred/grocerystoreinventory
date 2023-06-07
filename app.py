@@ -1,6 +1,7 @@
 # This is where I learned to remove the dollar sign ($) from the prices when cleaning up the data: https://builtin.com/software-engineering-perspectives/python-remove-character-from-string
 # This is where I learned to join both tables together in order to query the brand's table to get a brand's name using its ID: https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_orm_working_with_joins.htm
-from models import (Brands, session, Base, Product, engine)
+# This is where I learned about func.count(): https://www.geeksforgeeks.org/group-by-and-count-function-in-sqlalchemy/
+from models import (func, Brands, session, Base, Product, engine)
 import csv
 import datetime
 
@@ -182,7 +183,7 @@ def app():
         # Analyze the database
             most_expensive_item = session.query(Product.product_name).order_by(Product.product_price.desc()).first()
             least_expensive_item = session.query(Product.product_name).order_by(Product.product_price).first()
-            brand_most_products = session.query(Brands.brand_name).join(Product).order_by(Product.product_name).first()
+            brand_most_products = session.query(Brands.brand_name).join(Product).group_by(Brands.id).order_by(func.count(Product.id).desc()).first()
             product_with_highest_quantity = session.query(Product.product_name).order_by(Product.product_quantity.desc()).first()
             total_products = session.query(Product).count()
             print(f'''Most Expensive Item: {most_expensive_item}''')
